@@ -11,7 +11,8 @@ class Messages extends Model
     
     protected $fillable = [
         'user_id',
-        'timestamp',
+        'date',
+        'time',
         'message',
     ];
 }

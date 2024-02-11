@@ -1,9 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Messages;
-use Illuminate\Http\Request;
 
+use App\Models\Messages;
+use App\Models\Response; 
+use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
@@ -33,4 +34,33 @@ class MessageController extends Controller
         // Return messages as JSON response
         return response()->json($messages, 200);
     }
+
+    public function show($id)
+    {
+        $message = Messages::findOrFail($id); 
+        return view('show', compact('message')); 
+    }
+
+    public function respond(Request $request, $id)
+{
+    $message = Messages::findOrFail($id); 
+
+    $validatedData = $request->validate([
+        'response' => 'required|string',
+    ]);
+
+    // Create a new response instance and save it to the database
+    $response = new Response();
+    $response->message_id = $message->id;
+    $response->response = $validatedData['response'];
+    $response->save();
+
+    // Update the status of the message
+    $message->status = 'responded';
+    $message->save();
+
+    // Redirect to the index page of responses associated with the message
+    return redirect()->route('responses.index', ['message_id' => $message->id])->with('success', 'Response sent successfully!');
+}
+
 }

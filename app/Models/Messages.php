@@ -15,4 +15,8 @@ class Messages extends Model
         'time',
         'message',
     ];
+    public function responses()
+    {
+        return $this->hasMany(Response::class);
+    }
 }
